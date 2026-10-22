@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo English - Unit 1: Part 1 (Vocabulary)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        duoGreen: '#58cc02',
+                        duoGreenDark: '#46a302',
+                        duoBlue: '#1cb0f6',
+                        duoBlueDark: '#1899d6',
+                        duoRed: '#ff4b4b',
+                        duoRedDark: '#ea2b2b',
+                        duoYellow: '#ffc800',
+                        duoYellowDark: '#e5b200',
+                        duoGray: '#e5e5e5',
+                        duoDarkText: '#4b4b4b',
+                    },
+                    fontFamily: {
+                        nunito: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #f8fafc;
+        }
+
+        .btn-3d {
+            transition: all 0.1s ease;
+            position: relative;
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: none !important;
+        }
+        
+        .btn-green-3d {
+            background-color: #58cc02;
+            box-shadow: 0 4px 0 #46a302;
+            color: white;
+        }
+        .btn-green-3d:hover:not(:disabled) {
+            background-color: #61e002;
+        }
+
+        .btn-blue-3d {
+            background-color: #1cb0f6;
+            box-shadow: 0 4px 0 #1899d6;
+            color: white;
+        }
+        .btn-blue-3d:hover:not(:disabled) {
+            background-color: #2bd0ff;
+        }
+
+        .btn-red-3d {
+            background-color: #ff4b4b;
+            box-shadow: 0 4px 0 #ea2b2b;
+            color: white;
+        }
+        .btn-red-3d:hover:not(:disabled) {
+            background-color: #ff5c5c;
+        }
+
+        .btn-gray-3d {
+            background-color: #ffffff;
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 4px 0 #e5e5e5;
+            color: #4b4b4b;
+        }
+        .btn-gray-3d:hover:not(:disabled) {
+            background-color: #f7f7f7;
+        }
+
+        .chip-selected {
+            background-color: #ddf4ff !important;
+            border-color: #84d8ff !important;
+            color: #1cb0f6 !important;
+            box-shadow: 0 2px 0 #84d8ff !important;
+        }
+
+        .chip-matched {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .chip-wrong {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff4b4b !important;
+            background-color: #ffdfe0 !important;
+            color: #ff4b4b !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        @keyframes mascotBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+
+        .mascot-animated {
+            animation: mascotBounce 2.5s infinite ease-in-out;
+        }
+
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: 1.25rem;
+            border: 2px solid #e5e5e5;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 24px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-right-color: #ffffff;
+            border-left: 0;
+            margin-top: -10px;
+        }
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 24px;
+            width: 0;
+            height: 0;
+            border: 11px solid transparent;
+            border-right-color: #e5e5e5;
+            border-left: 0;
+            margin-top: -11px;
+        }
+    </style>
+</head>
+<body class="text-duoDarkText min-h-screen flex flex-col justify-between">
+
+    <div class="fixed top-2 right-2 bg-slate-800/80 text-white text-xs px-2.5 py-1 rounded-full z-50 pointer-events-none opacity-60">
+        Phím tắt qua câu: <span class="font-mono bg-slate-700 px-1 rounded text-yellow-300">Shift + T + N</span>
+    </div>
+
+    <header class="max-w-2xl mx-auto w-full pt-4 px-4 flex items-center justify-between gap-4">
+        <button id="close-btn" onclick="exitGame()" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-2">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+
+        <div class="flex-1 bg-gray-200 h-4 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-duoGreen h-full w-0 transition-all duration-300 rounded-full relative">
+                <div class="absolute inset-x-0 top-0 h-1 bg-white/30"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 text-lg font-bold">
+            <div class="flex items-center gap-1.5 text-duoRed">
+                <i class="fa-solid fa-heart animate-pulse"></i>
+                <span id="hearts-count">3</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-duoYellow">
+                <i class="fa-solid fa-bolt"></i>
+                <span id="xp-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center px-4 py-4">
+
+        <div class="flex items-start gap-3 mb-5" id="duo-header">
+            <div class="relative w-20 h-24 flex-shrink-0 cursor-pointer mascot-animated" onclick="speakMascotGreeting()">
+                <svg viewBox="0 0 120 140" class="w-full h-full drop-shadow-md">
+                    <path d="M 75 15 C 35 15, 18 45, 18 85 C 18 115, 40 135, 70 135 C 98 135, 112 112, 112 88 C 112 62, 92 48, 68 48 C 52 48, 38 56, 32 68 C 35 42, 52 30, 75 30 Z" fill="#58cc02" stroke="#46a302" stroke-width="4" stroke-linejoin="round"/>
+                    <ellipse cx="68" cy="92" rx="20" ry="22" fill="#ffffff" stroke="#e5e5e5" stroke-width="2"/>
+                    <circle cx="48" cy="42" r="10" fill="white" stroke="#46a302" stroke-width="1.5"/>
+                    <circle id="pupil-left" cx="50" cy="42" r="4.5" fill="#2d3748"/>
+                    <circle cx="52" cy="39" r="1.5" fill="white"/>
+                    <circle cx="72" cy="38" r="10" fill="white" stroke="#46a302" stroke-width="1.5"/>
+                    <circle id="pupil-right" cx="74" cy="38" r="4.5" fill="#2d3748"/>
+                    <circle cx="76" cy="35" r="1.5" fill="white"/>
+                    <path d="M 40 28 Q 48 24 54 29" stroke="#388e00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M 66 24 Q 72 20 78 25" stroke="#388e00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="38" cy="50" rx="4" ry="2.5" fill="#ff4b4b" opacity="0.4"/>
+                    <ellipse cx="80" cy="46" rx="4" ry="2.5" fill="#ff4b4b" opacity="0.4"/>
+                    <path d="M 55 52 Q 61 60 67 50" stroke="#2d3748" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M 16 70 Q 4 65 8 55" stroke="#46a302" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <path d="M 108 75 Q 118 70 114 60" stroke="#46a302" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div class="speech-bubble p-4 flex-1 shadow-sm mt-1">
+                <p id="duo-dialogue" class="font-extrabold text-base sm:text-lg text-slate-700 leading-snug">
+                    Xin chào! Bạn Số 6 siêu vui nhộn sẽ cùng bạn ôn tập Từ Vựng Unit 1 nhé! 🚀
+                </p>
+            </div>
+        </div>
+
+        <div id="game-stage" class="min-h-[320px] flex flex-col justify-center"></div>
+
+    </main>
+
+    <footer id="bottom-bar" class="border-t-2 border-gray-200 bg-white py-4 px-4">
+        <div class="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div id="feedback-message" class="hidden flex items-center gap-3 w-full sm:w-auto">
+                <div id="feedback-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xl flex-shrink-0"></div>
+                <div>
+                    <h4 id="feedback-title" class="font-extrabold text-lg"></h4>
+                    <p id="feedback-detail" class="text-sm font-bold text-gray-600"></p>
+                </div>
+            </div>
+            <button id="action-btn" onclick="checkAnswer()" class="btn-3d btn-green-3d w-full py-3.5 rounded-2xl font-extrabold text-lg uppercase tracking-wider">
+                Kiểm Tra
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const curriculum = {
+            vocab: [
+                { word: 'calculator', mean: 'máy tính cầm tay', icon: 'fa-calculator' },
+                { word: 'compass', mean: 'cái compa', icon: 'fa-compass' },
+                { word: 'pencil case', mean: 'hộp bút', icon: 'fa-pen-ruler' },
+                { word: 'pencil sharpener', mean: 'cái gọt bút chì', icon: 'fa-pencil' },
+                { word: 'rubber', mean: 'cục tẩy', icon: 'fa-eraser' },
+                { word: 'school bag', mean: 'cặp sách', icon: 'fa-bag-shopping' },
+                { word: 'uniform', mean: 'đồng phục', icon: 'fa-shirt' },
+                { word: 'maths', mean: 'môn Toán', icon: 'fa-square-root-variable' },
+                { word: 'science', mean: 'môn Khoa học', icon: 'fa-flask' },
+                { word: 'history', mean: 'môn Lịch sử', icon: 'fa-landmark' }
+            ],
+            matchingPairs: [
+                { id: 1, left: 'play', right: 'football' },
+                { id: 2, left: 'do', right: 'homework' },
+                { id: 3, left: 'have', right: 'school lunch' },
+                { id: 4, left: 'study', right: 'maths' },
+                { id: 5, left: 'wear', right: 'uniform' },
+                { id: 6, left: 'pencil', right: 'case' },
+                { id: 7, left: 'school', right: 'bag' }
+            ],
+            scrambles: [
+                {
+                    prompt: 'Xếp câu: "Tôi chơi bóng đá."',
+                    target: ['I', 'play', 'football.'],
+                    distractors: ['plays', 'do']
+                },
+                {
+                    prompt: 'Xếp câu: "Cô ấy học tiếng Anh."',
+                    target: ['She', 'studies', 'English.'],
+                    distractors: ['study', 'play']
+                },
+                {
+                    prompt: 'Xếp câu: "Chúng tôi luôn đi học bằng xe buýt."',
+                    target: ['We', 'always', 'go', 'to', 'school', 'by', 'bus.'],
+                    distractors: ['goes', 'on']
+                },
+                {
+                    prompt: 'Xếp câu: "Tôi thường thức dậy muộn vào Thứ Bảy."',
+                    target: ['I', 'usually', 'get', 'up', 'late', 'on', 'Saturdays.'],
+                    distractors: ['gets', 'early']
+                }
+            ]
+        };
+
+        let currentLevel = 1;
+        let levelQuestionIndex = 0;
+        let hearts = 3;
+        let xp = 0;
+        let selectedOption = null;
+        let selectedTokens = [];
+        let matchingState = { leftId: null, rightId: null, matchedCount: 0 };
+
+        const pressedKeys = new Set();
+        window.addEventListener('keydown', (e) => {
+            pressedKeys.add(e.key.toUpperCase());
+            if (pressedKeys.has('SHIFT') && pressedKeys.has('T') && pressedKeys.has('N')) {
+                e.preventDefault();
+                pressedKeys.clear();
+                devSkipQuestion();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            pressedKeys.delete(e.key.toUpperCase());
+        });
+
+        function devSkipQuestion() {
+            playSound('correct');
+            xp += 10;
+            advanceLevel();
+        }
+
+        // Web Audio API Sound System (Giữ nguyên)
+        function playSound(type) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                }
+            } catch (e) {}
+        }
+
+        // Speech Synthesis (Giữ nguyên)
+        function speakWord(text) {
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (e) {}
+        }
+
+        function speakMascotGreeting() {
+            playSound('click');
+            speakWord('Hello! Let\'s learn English together!');
+        }
+
+        window.onload = () => {
+            renderStage();
+            updateProgress();
+        };
+
+        function updateProgress() {
+            const totalSteps = curriculum.vocab.length + 1 + curriculum.scrambles.length;
+            let completedSteps = 0;
+            if (currentLevel === 1) completedSteps = levelQuestionIndex;
+            else if (currentLevel === 2) completedSteps = curriculum.vocab.length;
+            else if (currentLevel === 3) completedSteps = curriculum.vocab.length + 1 + levelQuestionIndex;
+            else if (currentLevel === 4) completedSteps = totalSteps;
+
+            const percentage = Math.min((completedSteps / totalSteps) * 100, 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('hearts-count').innerText = hearts;
+            document.getElementById('xp-count').innerText = xp;
+        }
+
+        function renderStage() {
+            resetFooter();
+            const stage = document.getElementById('game-stage');
+            stage.innerHTML = '';
+
+            if (hearts <= 0) {
+                renderGameOver();
+                return;
+            }
+
+            switch(currentLevel) {
+                case 1:
+                    renderVocabStage(stage);
+                    break;
+                case 2:
+                    renderMatchingStage(stage);
+                    break;
+                case 3:
+                    renderScrambleStage(stage);
+                    break;
+                case 4:
+                    goToPart2(); // Tự động chuyển qua phần ngữ pháp luôn không cần hiện nút bấm
+                    break;
+            }
+        }
+
+        function renderVocabStage(container) {
+            const qData = curriculum.vocab[levelQuestionIndex];
+            document.getElementById('duo-dialogue').innerText = `Nghe phát âm và chọn nghĩa Tiếng Việt đúng nhé! 🎧`;
+
+            let choices = [qData.mean];
+            let otherMeans = curriculum.vocab.filter(v => v.mean !== qData.mean).map(v => v.mean);
+            shuffleArray(otherMeans);
+            choices = choices.concat(otherMeans.slice(0, 3));
+            shuffleArray(choices);
+
+            let choicesHtml = '';
+            for (let i = 0; i < choices.length; i++) {
+                choicesHtml += '<button onclick="selectOption(this, \'' + choices[i] + '\')" class="option-btn btn-3d btn-gray-3d p-4 rounded-2xl font-extrabold text-center text-base sm:text-lg">' + choices[i] + '</button>';
+            }
+
+            const html = `
+                <div class="flex flex-col items-center">
+                    <button onclick="speakWord('${qData.word}'); playSound('click');" class="btn-3d btn-blue-3d px-6 py-5 rounded-3xl mb-6 flex items-center gap-4 text-2xl font-black w-full justify-center">
+                        <i class="fa-solid ${qData.icon} text-3xl"></i>
+                        <span>${qData.word}</span>
+                        <i class="fa-solid fa-volume-high text-xl ml-2 animate-bounce"></i>
+                    </button>
+
+                    <p class="text-gray-500 font-bold mb-3 text-sm uppercase tracking-wide">Chọn nghĩa đúng:</p>
+
+                    <div class="grid grid-cols-2 gap-3 w-full">
+                        ${choicesHtml}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+            speakWord(qData.word);
+        }
+
+        function renderMatchingStage(container) {
+            document.getElementById('duo-dialogue').innerText = `Ghép các từ hoặc cụm từ tương ứng ở 2 cột nhé! 🧩`;
+
+            const pairs = curriculum.matchingPairs;
+            let lefts = pairs.map(item => ({ id: item.id, text: item.left }));
+            let rights = pairs.map(item => ({ id: item.id, text: item.right }));
+
+            shuffleArray(lefts);
+            shuffleArray(rights);
+
+            let leftsHtml = '';
+            for (let i = 0; i < lefts.length; i++) {
+                leftsHtml += '<button id="left-' + lefts[i].id + '" onclick="clickMatchTile(\'left\', ' + lefts[i].id + ', \'' + lefts[i].text + '\')" class="match-tile btn-3d btn-gray-3d p-3 rounded-2xl font-black text-base sm:text-lg text-left flex items-center justify-between"><span>' + lefts[i].text + '</span><i class="fa-solid fa-volume-high text-xs text-gray-400"></i></button>';
+            }
+
+            let rightsHtml = '';
+            for (let i = 0; i < rights.length; i++) {
+                rightsHtml += '<button id="right-' + rights[i].id + '" onclick="clickMatchTile(\'right\', ' + rights[i].id + ')" class="match-tile btn-3d btn-gray-3d p-3 rounded-2xl font-black text-base sm:text-lg text-center">' + rights[i].text + '</button>';
+            }
+
+            const html = `
+                <div class="grid grid-cols-2 gap-3 w-full my-auto">
+                    <div class="flex flex-col gap-2.5" id="left-col">
+                        ${leftsHtml}
+                    </div>
+                    <div class="flex flex-col gap-2.5" id="right-col">
+                        ${rightsHtml}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+            document.getElementById('action-btn').style.display = 'none';
+        }
+
+        function clickMatchTile(side, id, text) {
+            playSound('click');
+            if (side === 'left') {
+                if (text) speakWord(text);
+                if (matchingState.leftId !== null) {
+                    const prev = document.getElementById(`left-${matchingState.leftId}`);
+                    if(prev) prev.classList.remove('chip-selected');
+                }
+                matchingState.leftId = id;
+                document.getElementById(`left-${id}`).classList.add('chip-selected');
+            } else {
+                if (matchingState.rightId !== null) {
+                    const prev = document.getElementById(`right-${matchingState.rightId}`);
+                    if(prev) prev.classList.remove('chip-selected');
+                }
+                matchingState.rightId = id;
+                document.getElementById(`right-${id}`).classList.add('chip-selected');
+            }
+
+            if (matchingState.leftId !== null && matchingState.rightId !== null) {
+                if (matchingState.leftId === matchingState.rightId) {
+                    playSound('correct');
+                    const leftEl = document.getElementById(`left-${matchingState.leftId}`);
+                    const rightEl = document.getElementById(`right-${matchingState.rightId}`);
+
+                    if (leftEl) leftEl.classList.add('chip-matched');
+                    if (rightEl) rightEl.classList.add('chip-matched');
+
+                    matchingState.matchedCount++;
+                    xp += 5;
+                    updateProgress();
+
+                    matchingState.leftId = null;
+                    matchingState.rightId = null;
+
+                    if (matchingState.matchedCount === curriculum.matchingPairs.length) {
+                        setTimeout(() => {
+                            currentLevel = 3;
+                            levelQuestionIndex = 0;
+                            document.getElementById('action-btn').style.display = 'block';
+                            renderStage();
+                        }, 500);
+                    }
+                } else {
+                    playSound('wrong');
+                    const leftEl = document.getElementById(`left-${matchingState.leftId}`);
+                    const rightEl = document.getElementById(`right-${matchingState.rightId}`);
+
+                    if (leftEl) leftEl.classList.add('chip-wrong');
+                    if (rightEl) rightEl.classList.add('chip-wrong');
+
+                    setTimeout(() => {
+                        if (leftEl) leftEl.classList.remove('chip-wrong', 'chip-selected');
+                        if (rightEl) rightEl.classList.remove('chip-wrong', 'chip-selected');
+                        matchingState.leftId = null;
+                        matchingState.rightId = null;
+                    }, 400);
+                }
+            }
+        }
+
+        function renderScrambleStage(container) {
+            const data = curriculum.scrambles[levelQuestionIndex];
+            document.getElementById('duo-dialogue').innerText = `${data.prompt}`;
+
+            let allTokens = [];
+            let tokenId = 0;
+
+            data.target.forEach(w => {
+                allTokens.push({ id: tokenId++, word: w, isTarget: true });
+            });
+            data.distractors.forEach(w => {
+                allTokens.push({ id: tokenId++, word: w, isTarget: false });
+            });
+
+            shuffleArray(allTokens);
+
+            let tokensHtml = '';
+            for (let i = 0; i < allTokens.length; i++) {
+                tokensHtml += '<button id="chip-' + allTokens[i].id + '" onclick="addToken(' + allTokens[i].id + ', \'' + allTokens[i].word + '\')" class="btn-3d btn-gray-3d px-4 py-2.5 rounded-xl font-extrabold text-base sm:text-lg">' + allTokens[i].word + '</button>';
+            }
+
+            const html = `
+                <div class="flex flex-col gap-6 w-full">
+                    <div id="sentence-target" class="min-h-[80px] border-b-2 border-gray-300 pb-3 flex flex-wrap gap-2 items-center bg-white p-3 rounded-2xl shadow-inner">
+                        <span id="target-placeholder" class="text-gray-400 text-sm font-bold w-full text-center">Chạm vào các từ bên dưới để ghép câu...</span>
+                    </div>
+
+                    <div id="word-bank" class="flex flex-wrap gap-2.5 justify-center py-2">
+                        ${tokensHtml}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+            selectedTokens = [];
+        }
+
+        function addToken(id, word) {
+            playSound('click');
+            speakWord(word);
+
+            const chipBtn = document.getElementById(`chip-${id}`);
+            if (!chipBtn || chipBtn.style.opacity === '0.2') return;
+
+            chipBtn.style.opacity = '0.2';
+            chipBtn.style.pointerEvents = 'none';
+
+            selectedTokens.push({ id, word });
+            renderSelectedTokens();
+        }
+
+        function removeToken(id) {
+            playSound('click');
+            const index = selectedTokens.findIndex(t => t.id === id);
+            if (index > -1) {
+                selectedTokens.splice(index, 1);
+                const chipBtn = document.getElementById(`chip-${id}`);
+                if (chipBtn) {
+                    chipBtn.style.opacity = '1';
+                    chipBtn.style.pointerEvents = 'auto';
+                }
+                renderSelectedTokens();
+            }
+        }
+
+        function renderSelectedTokens() {
+            const targetContainer = document.getElementById('sentence-target');
+            if (selectedTokens.length === 0) {
+                targetContainer.innerHTML = '<span id="target-placeholder" class="text-gray-400 text-sm font-bold w-full text-center">Chạm vào các từ bên dưới để ghép câu...</span>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 0; i < selectedTokens.length; i++) {
+                html += '<button onclick="removeToken(' + selectedTokens[i].id + ')" class="btn-3d btn-blue-3d px-3.5 py-2 rounded-xl font-extrabold text-base sm:text-lg">' + selectedTokens[i].word + '</button>';
+            }
+            targetContainer.innerHTML = html;
+        }
+
+        function goToPart2() {
+            window.location.href = "unit1_grammar.html?xp=" + xp;
+        }
+
+        function renderGameOver() {
+            const container = document.getElementById('game-stage');
+            document.getElementById('duo-header').style.display = 'none';
+            document.getElementById('bottom-bar').style.display = 'none';
+
+            container.innerHTML = `
+                <div class="text-center flex flex-col items-center py-6">
+                    <div class="w-24 h-24 mb-4 text-duoRed animate-bounce">
+                        <i class="fa-solid fa-heart-crack text-7xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-800 mb-2">HẾT TIM MẤT RỒI! 💔</h2>
+                    <button onclick="restartGame()" class="btn-3d btn-blue-3d w-full py-4 rounded-2xl font-extrabold text-xl uppercase tracking-wider">Thử Lại Ngay</button>
+                </div>
+            `;
+        }
+
+        function selectOption(btn, val) {
+            playSound('click');
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('chip-selected'));
+            btn.classList.add('chip-selected');
+            selectedOption = val;
+        }
+
+        function checkAnswer() {
+            const actionBtn = document.getElementById('action-btn');
+
+            if (actionBtn.innerText === 'TIẾP TỤC') {
+                advanceLevel();
+                return;
+            }
+
+            let isCorrect = false;
+            let correctAnswerStr = '';
+
+            if (currentLevel === 1) {
+                if (!selectedOption) return;
+                const qData = curriculum.vocab[levelQuestionIndex];
+                isCorrect = (selectedOption === qData.mean);
+                correctAnswerStr = qData.mean;
+            } else if (currentLevel === 3) {
+                if (selectedTokens.length === 0) return;
+                const data = curriculum.scrambles[levelQuestionIndex];
+                const userSentence = selectedTokens.map(t => t.word).join(' ');
+                const targetSentence = data.target.join(' ');
+                isCorrect = (userSentence === targetSentence);
+                correctAnswerStr = targetSentence;
+            }
+
+            showFeedback(isCorrect, correctAnswerStr);
+        }
+
+        function showFeedback(isCorrect, answerDetail) {
+            const feedbackMsg = document.getElementById('feedback-message');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDetail = document.getElementById('feedback-detail');
+            const actionBtn = document.getElementById('action-btn');
+            const footer = document.getElementById('bottom-bar');
+
+            feedbackMsg.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                xp += 10;
+                footer.className = 'border-t-2 border-green-200 bg-green-100 py-4 px-4';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-duoGreen';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                feedbackTitle.className = 'font-extrabold text-lg text-duoGreenDark';
+                feedbackTitle.innerText = 'Chính xác! Giỏi lắm!';
+                feedbackDetail.innerText = '';
+                actionBtn.className = 'btn-3d btn-green-3d py-3.5 px-8 rounded-2xl font-extrabold text-lg uppercase w-full sm:w-auto';
+            } else {
+                playSound('wrong');
+                hearts--;
+                footer.className = 'border-t-2 border-red-200 bg-red-100 py-4 px-4';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-duoRed';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                feedbackTitle.className = 'font-extrabold text-lg text-duoRedDark';
+                feedbackTitle.innerText = 'Chưa đúng rồi!';
+                feedbackDetail.innerText = `Đáp án đúng: ${answerDetail}`;
+                actionBtn.className = 'btn-3d btn-red-3d py-3.5 px-8 rounded-2xl font-extrabold text-lg uppercase w-full sm:w-auto';
+            }
+
+            actionBtn.innerText = 'TIẾP TỤC';
+            updateProgress();
+        }
+
+        function resetFooter() {
+            const footer = document.getElementById('bottom-bar');
+            const feedbackMsg = document.getElementById('feedback-message');
+            const actionBtn = document.getElementById('action-btn');
+
+            footer.style.display = 'block';
+            footer.className = 'border-t-2 border-gray-200 bg-white py-4 px-4';
+            feedbackMsg.classList.add('hidden');
+            actionBtn.style.display = 'block';
+            actionBtn.className = 'btn-3d btn-green-3d w-full py-3.5 rounded-2xl font-extrabold text-lg uppercase tracking-wider';
+            actionBtn.innerText = 'KIỂM TRA';
+            selectedOption = null;
+        }
+
+        function advanceLevel() {
+            if (currentLevel === 1) {
+                levelQuestionIndex++;
+                if (levelQuestionIndex >= curriculum.vocab.length) {
+                    currentLevel = 2;
+                    levelQuestionIndex = 0;
+                }
+            } else if (currentLevel === 3) {
+                levelQuestionIndex++;
+                if (levelQuestionIndex >= curriculum.scrambles.length) {
+                    currentLevel = 4;
+                    levelQuestionIndex = 0;
+                }
+            }
+            renderStage();
+        }
+
+        function restartGame() {
+            currentLevel = 1;
+            levelQuestionIndex = 0;
+            hearts = 3;
+            xp = 0;
+            matchingState = { leftId: null, rightId: null, matchedCount: 0 };
+            document.getElementById('duo-header').style.display = 'flex';
+            renderStage();
+            updateProgress();
+        }
+
+        function exitGame() {
+            restartGame();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+    </script>
+</body>
+</html>

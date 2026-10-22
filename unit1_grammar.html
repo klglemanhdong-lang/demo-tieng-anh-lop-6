@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo English - Unit 1: Part 2 (Grammar)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        duoGreen: '#58cc02',
+                        duoGreenDark: '#46a302',
+                        duoBlue: '#1cb0f6',
+                        duoBlueDark: '#1899d6',
+                        duoRed: '#ff4b4b',
+                        duoRedDark: '#ea2b2b',
+                        duoYellow: '#ffc800',
+                        duoYellowDark: '#e5b200',
+                        duoGray: '#e5e5e5',
+                        duoDarkText: '#4b4b4b',
+                    },
+                    fontFamily: {
+                        nunito: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #f8fafc;
+        }
+
+        .btn-3d {
+            transition: all 0.1s ease;
+            position: relative;
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: none !important;
+        }
+        
+        .btn-green-3d {
+            background-color: #58cc02;
+            box-shadow: 0 4px 0 #46a302;
+            color: white;
+        }
+        .btn-green-3d:hover:not(:disabled) {
+            background-color: #61e002;
+        }
+
+        .btn-blue-3d {
+            background-color: #1cb0f6;
+            box-shadow: 0 4px 0 #1899d6;
+            color: white;
+        }
+        .btn-blue-3d:hover:not(:disabled) {
+            background-color: #2bd0ff;
+        }
+
+        .btn-red-3d {
+            background-color: #ff4b4b;
+            box-shadow: 0 4px 0 #ea2b2b;
+            color: white;
+        }
+        .btn-red-3d:hover:not(:disabled) {
+            background-color: #ff5c5c;
+        }
+
+        .btn-gray-3d {
+            background-color: #ffffff;
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 4px 0 #e5e5e5;
+            color: #4b4b4b;
+        }
+        .btn-gray-3d:hover:not(:disabled) {
+            background-color: #f7f7f7;
+        }
+
+        .chip-selected {
+            background-color: #ddf4ff !important;
+            border-color: #84d8ff !important;
+            color: #1cb0f6 !important;
+            box-shadow: 0 2px 0 #84d8ff !important;
+        }
+
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: 1.25rem;
+            border: 2px solid #e5e5e5;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 24px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-right-color: #ffffff;
+            border-left: 0;
+            margin-top: -10px;
+        }
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 24px;
+            width: 0;
+            height: 0;
+            border: 11px solid transparent;
+            border-right-color: #e5e5e5;
+            border-left: 0;
+            margin-top: -11px;
+        }
+    </style>
+</head>
+<body class="text-duoDarkText min-h-screen flex flex-col justify-between">
+
+    <header class="max-w-2xl mx-auto w-full pt-4 px-4 flex items-center justify-between gap-4">
+        <button id="close-btn" onclick="exitGame()" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-2">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+
+        <div class="flex-1 bg-gray-200 h-4 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-duoGreen h-full w-0 transition-all duration-300 rounded-full relative">
+                <div class="absolute inset-x-0 top-0 h-1 bg-white/30"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 text-lg font-bold">
+            <div class="flex items-center gap-1.5 text-duoRed">
+                <i class="fa-solid fa-heart animate-pulse"></i>
+                <span id="hearts-count">3</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-duoYellow">
+                <i class="fa-solid fa-bolt"></i>
+                <span id="xp-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto w-full flex-1 flex flex-col justify-center px-4 py-4">
+
+        <div class="flex items-start gap-3 mb-5" id="duo-header">
+            <div class="relative w-20 h-24 flex-shrink-0 cursor-pointer mascot-animated" onclick="speakMascotGreeting()">
+                <svg viewBox="0 0 120 140" class="w-full h-full drop-shadow-md">
+                    <path d="M 75 15 C 35 15, 18 45, 18 85 C 18 115, 40 135, 70 135 C 98 135, 112 112, 112 88 C 112 62, 92 48, 68 48 C 52 48, 38 56, 32 68 C 35 42, 52 30, 75 30 Z" fill="#58cc02" stroke="#46a302" stroke-width="4" stroke-linejoin="round"/>
+                    <ellipse cx="68" cy="92" rx="20" ry="22" fill="#ffffff" stroke="#e5e5e5" stroke-width="2"/>
+                    <circle cx="48" cy="42" r="10" fill="white" stroke="#46a302" stroke-width="1.5"/>
+                    <circle id="pupil-left" cx="50" cy="42" r="4.5" fill="#2d3748"/>
+                    <circle cx="52" cy="39" r="1.5" fill="white"/>
+                    <circle cx="72" cy="38" r="10" fill="white" stroke="#46a302" stroke-width="1.5"/>
+                    <circle id="pupil-right" cx="74" cy="38" r="4.5" fill="#2d3748"/>
+                    <circle cx="76" cy="35" r="1.5" fill="white"/>
+                    <path d="M 40 28 Q 48 24 54 29" stroke="#388e00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M 66 24 Q 72 20 78 25" stroke="#388e00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="38" cy="50" rx="4" ry="2.5" fill="#ff4b4b" opacity="0.4"/>
+                    <ellipse cx="80" cy="46" rx="4" ry="2.5" fill="#ff4b4b" opacity="0.4"/>
+                    <path d="M 55 52 Q 61 60 67 50" stroke="#2d3748" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M 16 70 Q 4 65 8 55" stroke="#46a302" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <path d="M 108 75 Q 118 70 114 60" stroke="#46a302" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div class="speech-bubble p-4 flex-1 shadow-sm mt-1">
+                <p id="duo-dialogue" class="font-extrabold text-base sm:text-lg text-slate-700 leading-snug">
+                    Chọn từ đúng nhất điền vào chỗ trống! ✍️
+                </p>
+            </div>
+        </div>
+
+        <div id="game-stage" class="min-h-[320px] flex flex-col justify-center"></div>
+
+    </main>
+
+    <footer id="bottom-bar" class="border-t-2 border-gray-200 bg-white py-4 px-4">
+        <div class="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div id="feedback-message" class="hidden flex items-center gap-3 w-full sm:w-auto">
+                <div id="feedback-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xl flex-shrink-0"></div>
+                <div>
+                    <h4 id="feedback-title" class="font-extrabold text-lg"></h4>
+                    <p id="feedback-detail" class="text-sm font-bold text-gray-600"></p>
+                </div>
+            </div>
+            <button id="action-btn" onclick="checkAnswer()" class="btn-3d btn-green-3d w-full py-3.5 rounded-2xl font-extrabold text-lg uppercase tracking-wider">
+                Kiểm Tra
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // --- LẤY DỮ LIỆU ĐÃ XÁO TRỘN TỪ INDEX HOẶC DÙNG MẶC ĐỊNH ---
+        let grammarQuiz;
+        const savedGrammar = sessionStorage.getItem('shuffledGrammar');
+        if (savedGrammar) {
+            grammarQuiz = JSON.parse(savedGrammar);
+        } else {
+            grammarQuiz = [
+                {
+                    question: 'I _____ football after school.',
+                    options: ['play', 'plays', 'playing'],
+                    answer: 'play',
+                    explain: 'Chủ ngữ "I" + Động từ nguyên mẫu (play).'
+                },
+                {
+                    question: 'She _____ in a small house.',
+                    options: ['live', 'lives', 'living'],
+                    answer: 'lives',
+                    explain: 'Chủ ngữ "She" + Động từ thêm -s (lives).'
+                },
+                {
+                    question: 'We _____ go to school on Sunday.',
+                    options: ["don't", "doesn't", "not"],
+                    answer: "don't",
+                    explain: 'Chủ ngữ "We" dùng trợ động từ phủ định "don\'t".'
+                },
+                {
+                    question: '_____ you like your new school?',
+                    options: ['Do', 'Does', 'Are'],
+                    answer: 'Do',
+                    explain: 'Câu hỏi nghi vấn với "you" dùng "Do".'
+                }
+            ];
+        }
+
+        let levelQuestionIndex = 0;
+        let hearts = 3;
+        let xp = 0;
+        let selectedOption = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('xp')) {
+            xp = parseInt(urlParams.get('xp')) || 0;
+        }
+
+        // Web Audio API Sound System
+        function playSound(type) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'victory') {
+                    // HIỆU ỨNG ÂM THANH PHÁO BÔNG & HOÀN THÀNH CHIẾN THẮNG
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                    notes.forEach((freq, idx) => {
+                        const vOsc = audioCtx.createOscillator();
+                        const vGain = audioCtx.createGain();
+                        vOsc.type = 'triangle';
+                        vOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.12);
+                        vGain.gain.setValueAtTime(0.25, audioCtx.currentTime + idx * 0.12);
+                        vGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.12 + 0.4);
+                        vOsc.connect(vGain);
+                        vGain.connect(audioCtx.destination);
+                        vOsc.start(audioCtx.currentTime + idx * 0.12);
+                        vOsc.stop(audioCtx.currentTime + idx * 0.12 + 0.4);
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function speakWord(text) {
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (e) {}
+        }
+
+        function speakMascotGreeting() {
+            playSound('click');
+            speakWord('Hello! Let\'s learn English together!');
+        }
+
+        window.onload = () => {
+            renderStage();
+            updateProgress();
+        };
+
+        function updateProgress() {
+            const percentage = Math.min((levelQuestionIndex / grammarQuiz.length) * 100, 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('hearts-count').innerText = hearts;
+            document.getElementById('xp-count').innerText = xp;
+        }
+
+        function renderStage() {
+            resetFooter();
+            const stage = document.getElementById('game-stage');
+            stage.innerHTML = '';
+
+            if (hearts <= 0) {
+                renderGameOver();
+                return;
+            }
+
+            if (levelQuestionIndex < grammarQuiz.length) {
+                renderGrammarStage(stage);
+            } else {
+                renderVictoryStage(stage);
+            }
+        }
+
+        function renderGrammarStage(container) {
+            const data = grammarQuiz[levelQuestionIndex];
+
+            let optionsHtml = '';
+            for (let i = 0; i < data.options.length; i++) {
+                optionsHtml += `<button data-val="${data.options[i]}" class="option-btn btn-3d btn-gray-3d p-4 rounded-2xl font-black text-xl text-center">${data.options[i]}</button>`;
+            }
+
+            const html = `
+                <div class="flex flex-col items-center w-full">
+                    <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 w-full text-center shadow-sm">
+                        <h3 class="text-2xl font-black text-slate-800 tracking-wide">${data.question}</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full" id="options-container">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectOption(this, this.getAttribute('data-val'));
+                });
+            });
+        }
+
+        function selectOption(btn, val) {
+            playSound('click');
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('chip-selected'));
+            btn.classList.add('chip-selected');
+            selectedOption = val;
+        }
+
+        function checkAnswer() {
+            const actionBtn = document.getElementById('action-btn');
+
+            if (actionBtn.innerText === 'TIẾP TỤC') {
+                levelQuestionIndex++;
+                renderStage();
+                return;
+            }
+
+            if (!selectedOption) return;
+            const data = grammarQuiz[levelQuestionIndex];
+            const isCorrect = (selectedOption === data.answer);
+            const correctAnswerStr = `${data.answer} (${data.explain})`;
+
+            showFeedback(isCorrect, correctAnswerStr);
+        }
+
+        function showFeedback(isCorrect, answerDetail) {
+            const feedbackMsg = document.getElementById('feedback-message');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDetail = document.getElementById('feedback-detail');
+            const actionBtn = document.getElementById('action-btn');
+            const footer = document.getElementById('bottom-bar');
+
+            feedbackMsg.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                xp += 10;
+                footer.className = 'border-t-2 border-green-200 bg-green-100 py-4 px-4';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-duoGreen';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                feedbackTitle.className = 'font-extrabold text-lg text-duoGreenDark';
+                feedbackTitle.innerText = 'Chính xác! Giỏi lắm!';
+                feedbackDetail.innerText = '';
+                actionBtn.className = 'btn-3d btn-green-3d py-3.5 px-8 rounded-2xl font-extrabold text-lg uppercase w-full sm:w-auto';
+            } else {
+                playSound('wrong');
+                hearts--;
+                footer.className = 'border-t-2 border-red-200 bg-red-100 py-4 px-4';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-white text-xl bg-duoRed';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                feedbackTitle.className = 'font-extrabold text-lg text-duoRedDark';
+                feedbackTitle.innerText = 'Chưa đúng rồi!';
+                feedbackDetail.innerText = `Đáp án đúng: ${answerDetail}`;
+                actionBtn.className = 'btn-3d btn-red-3d py-3.5 px-8 rounded-2xl font-extrabold text-lg uppercase w-full sm:w-auto';
+            }
+
+            actionBtn.innerText = 'TIẾP TỤC';
+            updateProgress();
+        }
+
+        function resetFooter() {
+            const footer = document.getElementById('bottom-bar');
+            const feedbackMsg = document.getElementById('feedback-message');
+            const actionBtn = document.getElementById('action-btn');
+
+            footer.style.display = 'block';
+            footer.className = 'border-t-2 border-gray-200 bg-white py-4 px-4';
+            feedbackMsg.classList.add('hidden');
+            actionBtn.style.display = 'block';
+            actionBtn.className = 'btn-3d btn-green-3d w-full py-3.5 rounded-2xl font-extrabold text-lg uppercase tracking-wider';
+            actionBtn.innerText = 'KIỂM TRA';
+            selectedOption = null;
+        }
+
+        function renderVictoryStage(container) {
+            document.getElementById('duo-header').style.display = 'none';
+            document.getElementById('bottom-bar').style.display = 'none';
+
+            // KÍCH HOẠT ÂM THANH MÀN BẮN PHÁO BÔNG
+            playSound('victory');
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            }
+
+            container.innerHTML = `
+                <div class="text-center flex flex-col items-center py-4">
+                    <div class="w-32 h-36 mb-2 animate-bounce">
+                        <svg viewBox="0 0 120 140" class="w-full h-full drop-shadow-lg">
+                            <path d="M 75 15 C 35 15, 18 45, 18 85 C 18 115, 40 135, 70 135 C 98 135, 112 112, 112 88 C 112 62, 92 48, 68 48 C 52 48, 38 56, 32 68 C 35 42, 52 30, 75 30 Z" fill="#58cc02" stroke="#46a302" stroke-width="4"/>
+                            <ellipse cx="68" cy="92" rx="20" ry="22" fill="#ffffff"/>
+                            <path d="M 40 42 Q 48 34 56 42" stroke="#2d3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <path d="M 64 38 Q 72 30 80 38" stroke="#2d3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <polygon points="50,12 60,2 70,12 80,4 85,18 45,18" fill="#ffc800" stroke="#e5b200" stroke-width="1.5"/>
+                            <path d="M 52 52 Q 62 64 72 52" stroke="#2d3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-3xl font-black text-slate-800 mb-1">HOÀN THÀNH XUẤT SẮC! 🎉</h2>
+                    <p class="text-gray-500 font-bold mb-6">Em đã nắm vững toàn bộ kiến thức Đề cương Unit 1!</p>
+
+                    <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                        <div class="bg-duoYellow/10 border-2 border-duoYellow p-4 rounded-2xl text-center">
+                            <p class="text-xs font-black text-duoYellowDark uppercase tracking-wider">Tổng Điểm XP</p>
+                            <p class="text-3xl font-black text-duoYellow">+${xp}</p>
+                        </div>
+                        <div class="bg-duoGreen/10 border-2 border-duoGreen p-4 rounded-2xl text-center">
+                            <p class="text-xs font-black text-duoGreenDark uppercase tracking-wider">Streak Đạt Được</p>
+                            <p class="text-3xl font-black text-duoGreen">1 Ngày 🔥</p>
+                        </div>
+                    </div>
+
+                    <button onclick="restartGame()" class="btn-3d btn-green-3d w-full py-4 rounded-2xl font-extrabold text-xl uppercase tracking-wider">
+                        Ôn Tập Lại Từ Đầu
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderGameOver() {
+            const container = document.getElementById('game-stage');
+            document.getElementById('duo-header').style.display = 'none';
+            document.getElementById('bottom-bar').style.display = 'none';
+
+            container.innerHTML = `
+                <div class="text-center flex flex-col items-center py-6">
+                    <div class="w-24 h-24 mb-4 text-duoRed animate-bounce">
+                        <i class="fa-solid fa-heart-crack text-7xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-800 mb-2">HẾT TIM MẤT RỒI! 💔</h2>
+                    <button onclick="restartGame()" class="btn-3d btn-blue-3d w-full py-4 rounded-2xl font-extrabold text-xl uppercase tracking-wider">Thử Lại Ngay</button>
+                </div>
+            `;
+        }
+
+        // BẮT ĐẦU LẠI GAME: Quay về file index (hoặc file từ vựng) để học lại từ đầu
+        function restartGame() {
+            if (sessionStorage.getItem('shuffledCurriculum')) {
+                window.location.href = "index.html"; // Nếu có index thì qua index để xáo trộn mới
+            } else {
+                window.location.href = "index.html"; // Mặc định về lại phần từ vựng
+            }
+        }
+
+        function exitGame() {
+            restartGame();
+        }
+    </script>
+</body>
+</html>
